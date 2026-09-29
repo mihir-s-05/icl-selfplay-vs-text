@@ -1,0 +1,7 @@
+torch>=2.5
+numpy
+huggingface_hub[hf_xet]>=1.0
+zstandard
+requests
+wandb
+matplotlib

@@ -1,0 +1,22 @@
+# secrets and personal notes
+.env
+PLAN.md
+chat.md
+
+# the paper's repo is cloned here separately (see README)
+self_play_pretraining/
+
+# large or machine-local artifacts (checkpoints and full results live on Hugging Face)
+icl_compare/ckpts*/
+icl_compare/data/
+icl_compare/results_final/
+icl_compare/state*/
+icl_compare/wandb/
+wandb/
+hf_upload/
+
+# smoke-test outputs
+icl_compare/results/*smoke*/
+
+__pycache__/
+*.pyc

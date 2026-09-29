@@ -1,0 +1,18 @@
+icl-selfplay-vs-text
+Copyright 2026 Mihir Srivastava
+
+This project builds on "Self-Play Pretraining with Zero Data" (arXiv 2609.30063)
+and its companion repository, https://github.com/nourya-aliz/self_play_pretraining.
+
+- The raw-byte ICL suite in icl_compare/icl/tasks.py (raw_sweep, raw_v2, raw_v3,
+  raw_v4, raw_extras, raw_control) is a port of the paper's evaluation harness
+  (figures/fig5_icl_sum_behavior/icl_harness/run_icl*.py), reproducing its prompts
+  byte for byte.
+- The model class and scoring code are imported from that repository at run time
+  and are not redistributed here. patches/self_play_pretraining.patch contains two
+  small fixes to it.
+- The self-play and universal-prior learner checkpoints evaluated here are the
+  paper's released weights (https://huggingface.co/nourya-cohen/solomonoff-paper).
+- writeup/figs/orx_figstyle.py is a vendored plotting style module.
+
+Natural-text training data: DCLM-Baseline 1.0 (mlfoundations/dclm-baseline-1.0).

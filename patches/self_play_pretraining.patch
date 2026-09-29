@@ -1,0 +1,45 @@
+diff --git a/scoring/src/scripts/bake_utils.py b/scoring/src/scripts/bake_utils.py
+index 39a61fc..49158db 100644
+--- a/scoring/src/scripts/bake_utils.py
++++ b/scoring/src/scripts/bake_utils.py
+@@ -65,7 +65,7 @@ def ensure_raw_cache(cache_file: Path, needed_bytes: int,
+             f"for {cache_file.stem}; reduce --num-sequences or --context-length")
+     tmp = cache_file.with_suffix(cache_file.suffix + '.tmp')
+     tmp.write_bytes(bytes(buf))
+-    tmp.rename(cache_file)
++    tmp.replace(cache_file)
+     return bytes(buf[:needed_bytes])
+ 
+ 
+@@ -110,7 +110,7 @@ def write_bake(out_path: Path, records: Iterable[dict], context_length: int,
+         for record in records:
+             f.write(json.dumps(record) + '\n')
+             n += 1
+-    tmp.rename(out_path)
++    tmp.replace(out_path)
+     n_validated = validate_baked_file(out_path, context_length)
+     assert n_validated == n
+     print(f"  wrote {n} sequences to {out_path} "
+diff --git a/scoring/src/config/__init__.py b/scoring/src/config/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/scoring/src/config/paths.py b/scoring/src/config/paths.py
+new file mode 100644
+index 0000000..21cfb1f
+--- /dev/null
++++ b/scoring/src/config/paths.py
+@@ -0,0 +1,14 @@
++"""Data-location constants used by the bake scripts.
++
++This module is imported by ``src.scripts.constants`` but was not part of the
++public release; this shim restores it. ``TEST_DATA_DIR`` is where
++``prepare_*_benchmark`` scripts write context-stamped bakes
++(``<TEST_DATA_DIR>/c<context>/<stem>.jsonl``) and cache raw sources.
++"""
++from pathlib import Path
++
++_SCORING_ROOT = Path(__file__).resolve().parents[2]
++
++TEST_DATA_DIR = _SCORING_ROOT / "data"
++SWEEP_GLOB = "sweep_*"
++SWEEP_SEED_GLOB = "sweep_*/seed-*"
