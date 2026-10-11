@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "icl-research-viewer",
+  "account_id": "35285b92cc8a889b1e38627664901535",
+  "compatibility_date": "2026-10-10",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    { "pattern": "icl.mihir-s.com", "custom_domain": true }
+  ],
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "none"
+  },
+  "observability": {
+    "enabled": true,
+    "traces": { "enabled": true }
+  },
+  "build": { "command": "npm run build" }
+}

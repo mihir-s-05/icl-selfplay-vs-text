@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An interactive companion to the self-play vs. text pretraining study: compare in-context learning across tasks, model sizes, seeds and training progress.">
+  <meta name="theme-color" content="#ffffff">
+  <title>Self-play vs. text pretraining · Research viewer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='white'/%3E%3Cpath d='M5 31L14 22L23 12L35 8' stroke='%23D55E00' fill='none' stroke-width='3'/%3E%3Cpath d='M5 33L14 29L23 25L35 16' stroke='%230072B2' fill='none' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#results">Skip to results</a>
+  <header class="site-header">
+    <a href="https://mihir-s.com" class="author-home">Mihir S.</a>
+    <nav aria-label="Sections"><a href="#abstract">Abstract</a><a href="#results">Results</a><a href="#methods">Methods</a><a href="#data">Data</a></nav>
+  </header>
+  <main>
+    <article>
+      <div class="paper-title">
+        <h1>Self-play vs. text pretraining:<br> what kind of in-context learning<br class="desktop-break"> does each produce?</h1>
+        <p class="byline"><a href="https://mihir-s.com">Mihir S.</a><span>September 2026</span></p>
+        <p class="paper-context">A follow-up to <a href="https://arxiv.org/abs/2609.30063">Self-Play Pretraining with Zero Data</a></p>
+        <div class="source-links"><a href="https://github.com/mihir-s-05/icl-selfplay-vs-text/blob/74e8f7be101e050c6982f2838f2d3ea980851f5f/writeup/WRITEUP.md">Full writeup</a><a href="https://github.com/mihir-s-05/icl-selfplay-vs-text">Code</a><a href="https://huggingface.co/datasets/rihim/icl-selfplay-vs-text-results">Results</a><a href="https://huggingface.co/rihim/icl-selfplay-vs-text-checkpoints">Checkpoints</a><a href="https://x.com/rihim_s/status/2104760031573078463">Thread</a></div>
+      </div>
+      <section id="abstract" class="abstract prose">
+        <h2>Abstract</h2>
+        <p>Does pretraining on self-generated programs teach the same in-context learning as pretraining on web text? We compare the same byte-level transformer architecture across six model sizes, matching learner tokens. <strong>They learn different kinds of ICL.</strong> Self-play leads on procedural tasks; text leads on lookup and word meaning. Starting text training from self-play also brings word-level ICL earlier.</p>
+        <p class="caveat">Models are at most 24M parameters. Text runs have 1–2 seeds. Learner tokens are matched, rather than total compute: self-play also trains a generator.</p>
+      </section>
+      <section id="results" class="results-section">
+        <div class="section-heading"><h2><span class="section-number">1.</span> Different data, different strengths</h2><a href="#explorer" class="quiet-link">Explore the measurements ↓</a></div>
+        <div class="figure-toolbar">
+          <label>Matched learner tokens <select id="scaling-tokens" aria-label="Scaling checkpoint"></select></label>
+          <label class="check-label"><input id="show-runs" type="checkbox" checked> Show text seeds</label>
+          <label class="check-label"><input id="show-up" type="checkbox"> Universal prior</label>
+        </div>
+        <div class="legend" id="scaling-legend" aria-label="Figure 1 legend"></div>
+        <figure class="scaling-figure">
+          <div class="plot-grid">
+            <div><h3><span>(a)</span> Procedural tasks</h3><div id="scaling-text" class="chart-host"></div><p>Printable-text format</p></div>
+            <div><h3><span>(b)</span> Lookup &amp; word meaning</h3><div id="scaling-word" class="chart-host"></div><p>Word format</p></div>
+            <div><h3><span>(c)</span> The paper’s byte format</h3><div id="scaling-raw" class="chart-host"></div><p>Raw-byte format</p></div>
+          </div>
+          <figcaption id="scaling-caption"></figcaption>
+        </figure>
+        <div class="figure-findings" id="scaling-findings" aria-live="polite"></div>
+        <details class="data-details"><summary>Figure 1 values &amp; download</summary><div class="table-scroll" id="scaling-table"></div><button id="download-scaling" class="text-button">Download Figure 1 CSV</button></details>
+      </section>
+      <section id="explorer" class="explorer-section">
+        <div class="section-heading"><h2><span class="section-number">2.</span> Explore the measurements</h2><span class="section-note">Every point is a released result</span></div>
+        <div class="view-tabs" role="tablist" aria-label="Result view">
+          <button role="tab" id="tab-training" aria-controls="explorer-panel" aria-selected="true" data-view="training">Training progress</button>
+          <button role="tab" id="tab-tasks" aria-controls="explorer-panel" aria-selected="false" tabindex="-1" data-view="tasks">By task</button>
+          <button role="tab" id="tab-examples" aria-controls="explorer-panel" aria-selected="false" tabindex="-1" data-view="examples">In-context examples</button>
+          <button role="tab" id="tab-transfer" aria-controls="explorer-panel" aria-selected="false" tabindex="-1" data-view="transfer">Self-play → text</button>
+          <button role="tab" id="tab-loss" aria-controls="explorer-panel" aria-selected="false" tabindex="-1" data-view="loss">Text loss</button>
+        </div>
+        <div id="explorer-panel" role="tabpanel" aria-labelledby="tab-training">
+          <div class="explorer-controls">
+            <label>Model size <select id="model-size" aria-label="Model size"></select></label>
+            <label id="suite-control">Prompt format <select id="suite" aria-label="Prompt format"><option value="text">Printable text</option><option value="word">Words</option><option value="raw">Raw bytes</option></select></label>
+            <label id="task-control">Task <select id="task" aria-label="Task"></select></label>
+            <label id="checkpoint-control">Learner tokens <select id="checkpoint" aria-label="Learner tokens"></select></label>
+            <label id="seed-control">Seeds <select id="seed" aria-label="Seeds"></select></label>
+            <label class="check-label" id="prior-control"><input id="explorer-up" type="checkbox"> Universal prior</label>
+          </div>
+          <div class="figure-heading"><h3 id="explorer-title"></h3><button class="text-button" id="reset-view">Reset selection</button></div>
+          <p class="metric-context" id="metric-context"></p>
+          <div id="explorer-legend" class="legend"></div>
+          <figure><div id="explorer-chart" class="chart-host wide-chart"></div><figcaption id="explorer-caption"></figcaption></figure>
+          <p id="selection-status" class="selection-status" role="status"></p>
+          <details class="data-details"><summary>Figure 2 values &amp; download</summary><div class="table-scroll" id="explorer-table"></div><button id="download-explorer" class="text-button">Download selection CSV</button></details>
+          <p class="figure-error" id="data-error" role="alert" hidden></p>
+        </div>
+      </section>
+      <section id="methods" class="methods-section">
+        <h2><span class="section-number">3.</span> What the comparison measures</h2>
+        <div class="methods-grid">
+          <div class="prose"><h3>Same architecture. Three prompt formats.</h3><p>The learner is a byte-level Llama-style transformer with a 4,096-byte context. Each task gives worked examples, then a query. Evaluation uses greedy decoding with no fine-tuning.</p><p>Printable-text and word answers require every byte to be correct. The raw reverse task uses per-byte accuracy, following the original paper. Suite scores average fixed task cells at m = 32–128; the word headline excludes word-order reversal. The explorer still includes the zero-scoring tasks.</p><div class="prompt-example"><span>Illustrative word prompt · arbitrary labels</span><pre>cat=t
+mouth=b
+rabbit=</pre><p>Query word unseen in the examples; predict <code>t</code>.</p></div></div>
+          <div class="prose"><h3>Read the uncertainty with the result.</h3><p>Self-play has four released seeds. Bands and whiskers are 95% Student’s t intervals over seeds, clipped to [0, 1] for display. Text has two seeds at 1M, 3M and 6M; one at the other sizes. Text runs appear individually, without a seed interval. Exact, unclipped bounds are in the tables.</p><p>Warm starts use one seed and begin at self-play round 8191 (51.54B prior learner tokens). Additional text tokens exclude that cost. The universal prior uses different program counts per round and has no released 24M checkpoint.</p><p>These are small-model observations across a narrow task set. The size trends are not established scaling laws, and the token-matched comparison does not establish a general advantage per unit of total compute.</p><a href="https://github.com/mihir-s-05/icl-selfplay-vs-text/blob/74e8f7be101e050c6982f2838f2d3ea980851f5f/writeup/WRITEUP.md#5-limitations">All limitations in the writeup →</a></div>
+        </div>
+      </section>
+      <section id="data" class="data-section">
+        <h2><span class="section-number">4.</span> Sources &amp; downloadable data</h2>
+        <p class="prose">This companion uses the five published CSV tables and original figures from the released repository. Values retain the source precision. Browse <a href="https://huggingface.co/datasets/rihim/icl-selfplay-vs-text-results/tree/main">full evaluation JSONs and training logs</a> for trial counts and experiment metadata.</p>
+        <div class="downloads" id="downloads"></div>
+        <details class="original-figures"><summary>Original publication figures · SVG &amp; PDF</summary><div id="original-figures"></div></details>
+        <p class="provenance" id="provenance"></p>
+        <p class="prose reference">Built on <a href="https://arxiv.org/abs/2609.30063">Self-Play Pretraining with Zero Data</a> by Cowsik et al., with <a href="https://github.com/nourya-aliz/self_play_pretraining">released code</a> and <a href="https://huggingface.co/nourya-cohen/solomonoff-paper">learners</a>. Text data: <a href="https://huggingface.co/datasets/mlfoundations/dclm-baseline-1.0">DCLM-Baseline 1.0</a>.</p>
+      </section>
+    </article>
+  </main>
+  <footer><a href="https://mihir-s.com">Mihir S.</a><span><a href="./LICENSE">Apache-2.0</a> · <a href="./NOTICE">Credits</a> · <a href="https://github.com/mihir-s-05/icl-selfplay-vs-text">Source</a></span></footer>
+  <noscript><p class="prose">Interactive figures require JavaScript. Read the <a href="./data/writeup.md">released writeup</a> or download the <a href="./data/headline.csv">headline CSV</a>.</p></noscript>
+</body>
+</html>
